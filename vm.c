@@ -189,6 +189,9 @@ int main(int argc, char *argv[])
                 sp = sp + 1;
                 strcpy(opr, "GEQ");
                 break;
+            case 11:
+                pas[sp] = (pas[sp] % 2 == 0);
+                break;
             default:
                 break;
             }
