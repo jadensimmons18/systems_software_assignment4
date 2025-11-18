@@ -493,17 +493,20 @@ void PROCEDURE_DECLARATION(int level)
         GET_TOKEN();                       // Next token should be an identifier
         if (currentToken.type != identsym) // If not error
         {
-            ERROR("ERROR: ");
+            ERROR("Error: const, var, read, procedure, and call keywords must be followed by identifier");
         }
-        if (symbol_table_check(currentToken.value) != -1)
+        
+        char procName[12];
+        strcpy(procName, currentToken.value);
+        if (symbol_table_check(procName) != -1)
         {
             ERROR("Error: symbol name has already been declared");
         }
-        char procName[12] = currentToken.value;
+
         GET_TOKEN();                           // Next token should be semicolon
         if (currentToken.type != semicolonsym) // If not error
         {
-            ERROR("ERROR: ");
+            ERROR("Error: procedure declaration must be followed by a semicolon");
         }
         GET_TOKEN();
         add_symbol_table(3, procName, 0, level, codeIndex, 0);
@@ -511,7 +514,7 @@ void PROCEDURE_DECLARATION(int level)
 
         if (currentToken.type != semicolonsym)
         {
-            ERROR("ERROR: ");
+            ERROR("Error: procedure declaration must be followed by a semicolon");
         }
         GET_TOKEN();
     }
