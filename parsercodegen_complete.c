@@ -47,7 +47,7 @@ typedef struct Symbol
     int kind;      // 1 = const, 2 = var
     char name[12]; // The variables name "x"
     int val;       // Only used for const holds the vars value (Ex. "5")
-    int level;     // Always 0
+    int level;     // L levels
     int addr;      // stores the address for variables (Not used for constants)
     int mark;      // 0 = unused, 1 = used
 } Symbol;
@@ -190,6 +190,7 @@ char *op_to_string(int op)
         return "Unknown";
     }
 }
+
 // Symbol Table Functions:
 int symbol_table_check(char *name) // Returns 1 if found, 0 if not
 {
@@ -482,6 +483,29 @@ void STATEMENT()
         return;
     }
 }
+void PROCEDURE_DECLARATION()
+{
+    while (currentToken.type == procsym)
+    {
+        GET_TOKEN();
+
+        if (currentToken.type != identsym)
+        {
+            ERROR("ERROR: ");
+        }
+        GET_TOKEN(); // Get next token
+
+        // todo add to symbol table
+
+        // todo BLOCK(level + 1);
+
+        if (currentToken.type != semicolonsym)
+        {
+            ERROR("ERROR: ");
+        }
+        GET_TOKEN();
+    }
+}
 int VAR_DECLARATION() // Returns number of variables
 {
     int numVars = 0;
@@ -564,6 +588,7 @@ void BLOCK()
 {
     CONST_DECLARATION();
     int numVars = VAR_DECLARATION();
+    // todo procedure-declaration
     emit(INC, 0, 3 + numVars);
     STATEMENT();
 }
@@ -597,10 +622,10 @@ int main()
 
     // Print the symbol table
     printf("Symbol Table:\n\n");
-    printf("%-6s | %-15s | %-10s | %-6s | %-8s | %-4s\n","Kind", "Name", "Value", "Level", "Address", "Mark");
+    printf("%-6s | %-15s | %-10s | %-6s | %-8s | %-4s\n", "Kind", "Name", "Value", "Level", "Address", "Mark");
     printf("---------------------------------------------------------------\n");
     for (int i = 0; i < symbol_table_index; i++)
     {
-        printf("%-6d | %-15s | %-10d | %-6d | %-8d | %-4d\n",symbol_table[i].kind,symbol_table[i].name,symbol_table[i].val,symbol_table[i].level,symbol_table[i].addr,symbol_table[i].mark);
+        printf("%-6d | %-15s | %-10d | %-6d | %-8d | %-4d\n", symbol_table[i].kind, symbol_table[i].name, symbol_table[i].val, symbol_table[i].level, symbol_table[i].addr, symbol_table[i].mark);
     }
 }

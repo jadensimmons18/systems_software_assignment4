@@ -86,7 +86,6 @@ void print(char opr[4], int l, int m, int pc, int bp, int sp, int stackStart)
     printf("\n");
 }
 
-
 int main(int argc, char *argv[])
 {
     if (argc < 2)
