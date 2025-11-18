@@ -194,14 +194,17 @@ char *op_to_string(int op)
 // Symbol Table Functions:
 int symbol_table_check(char *name) // Returns 1 if found, 0 if not
 {
-    for (int i = 0; i < symbol_table_index; i++)
+    for (int i = symbol_table_index - 1; i >= 0; i--) // Search backwards to find the closest match
     {
         if (strcmp(name, symbol_table[i].name) == 0)
         {
-            return i;
+            if (symbol_table[i].mark == 0) // If the identifier is avaiable return its index
+            {
+                return i;
+            }
         }
     }
-    return -1;
+    return -1; // No identifier was found
 }
 void add_symbol_table(int kind, char *name, int val, int level, int addr, int mark)
 {
@@ -487,16 +490,23 @@ void PROCEDURE_DECLARATION(int level)
 {
     while (currentToken.type == procsym)
     {
-        GET_TOKEN();
-
-        if (currentToken.type != identsym)
+        GET_TOKEN();                       // Next token should be an identifier
+        if (currentToken.type != identsym) // If not error
         {
             ERROR("ERROR: ");
         }
-        GET_TOKEN(); // Get next token
-
-        // todo add to symbol table
-
+        if (symbol_table_check(currentToken.value) != -1)
+        {
+            ERROR("Error: symbol name has already been declared");
+        }
+        char procName[12] = currentToken.value;
+        GET_TOKEN();                           // Next token should be semicolon
+        if (currentToken.type != semicolonsym) // If not error
+        {
+            ERROR("ERROR: ");
+        }
+        GET_TOKEN();
+        add_symbol_table(3, procName, 0, level, codeIndex, 0);
         BLOCK(level + 1);
 
         if (currentToken.type != semicolonsym)
