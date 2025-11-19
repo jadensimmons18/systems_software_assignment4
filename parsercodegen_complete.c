@@ -234,7 +234,7 @@ void FACTOR(int level)
         }
         else
         {
-            emit(LOD, 0, symbol_table[symIdx].addr);
+            emit(LOD, level - symbol_table[symIdx].level, symbol_table[symIdx].addr);
         }
         GET_TOKEN(); // Next Token
     }
@@ -383,7 +383,6 @@ void STATEMENT(int level)
 {
     if (currentToken.type == identsym) // If the token is an identifier
     {
-
         int symIdx = symbol_table_check(currentToken.value); // table check
         if (symIdx == -1)
         {
@@ -488,10 +487,9 @@ void STATEMENT(int level)
         emit(STO, 0, symbol_table[symIdx].addr);
         return;
     }
-    // todo
     if (currentToken.type == callsym)
     {
-        GET_TOKEN(); // Get identifier
+        GET_TOKEN(); // Must be an identifier
         if (currentToken.type != identsym)
         {
             ERROR("Error: const, var, read, procedure, and call keywords must be followed by identifier");
@@ -592,7 +590,7 @@ void CONST_DECLARATION(int level)
         do // runs atleast once
         {
             GET_TOKEN(); // Consumes "const" or ","
-            // Must be an identifier
+            // Next token must be an identifier
             if (currentToken.type != identsym)
             {
                 ERROR("Error: const, var, and read keywords must be followed by identifier");
