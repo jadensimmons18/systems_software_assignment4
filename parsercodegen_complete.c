@@ -399,7 +399,7 @@ void STATEMENT(int level)
         }
         GET_TOKEN();
         EXPRESSION(level);
-        emit(STO, 0, symbol_table[symIdx].addr);
+        emit(STO, level - symbol_table[symIdx].level, symbol_table[symIdx].addr);
         return;
     }
     if (currentToken.type == beginsym)
@@ -484,7 +484,7 @@ void STATEMENT(int level)
         }
         GET_TOKEN();
         emit(SYS, 0, 2);
-        emit(STO, 0, symbol_table[symIdx].addr);
+        emit(STO, level - symbol_table[symIdx].level, symbol_table[symIdx].addr);
         return;
     }
     if (currentToken.type == callsym)
