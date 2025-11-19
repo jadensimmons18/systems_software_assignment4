@@ -228,7 +228,6 @@ void FACTOR(int level)
         {
             ERROR("Error: undeclared identifier");
         }
-        symbol_table[symIdx].mark = 1;
         if (symbol_table[symIdx].kind == 1) // Must be a const
         {
             emit(LIT, 0, symbol_table[symIdx].val);
@@ -390,7 +389,6 @@ void STATEMENT(int level)
         {
             ERROR("Error: undeclared identifier");
         }
-        symbol_table[symIdx].mark = 1;
         if (symbol_table[symIdx].kind != 2) // Must be a var
         {
             ERROR("Error: only variable values may be altered");
@@ -431,6 +429,19 @@ void STATEMENT(int level)
         }
         GET_TOKEN();
         STATEMENT(level);
+        if (currentToken.type != elsesym)
+        {
+            ERROR("Error: if statement must include else clause");
+        }
+        GET_TOKEN();
+
+        int jmpIndex = codeIndex;
+        emit(JMP, 0, 0);
+
+        code[jpcIdx].m = codeIndex;
+
+        STATEMENT(level);
+        
         if (currentToken.type != fisym)
         {
             ERROR("Error: arithmetic equations must contain operands, parentheses, numbers, or symbols");
@@ -468,7 +479,6 @@ void STATEMENT(int level)
         {
             ERROR("Error: undeclared identifier");
         }
-        symbol_table[symIdx].mark = 1;
         if (symbol_table[symIdx].kind != 2)
         {
             ERROR("Error: only variable values may be altered");
@@ -476,6 +486,30 @@ void STATEMENT(int level)
         GET_TOKEN();
         emit(SYS, 0, 2);
         emit(STO, 0, symbol_table[symIdx].addr);
+        return;
+    }
+    // todo
+    if (currentToken.type == callsym)
+    {
+        GET_TOKEN(); // Get identifier
+        if (currentToken.type != identsym)
+        {
+            ERROR("Error: const, var, read, procedure, and call keywords must be followed by identifier");
+        }
+
+        int symIdx = symbol_table_check(currentToken.value);
+        if (symIdx == -1)
+        {
+            ERROR("Error: undeclared identifier");
+        }
+
+        if (symbol_table[symIdx].kind != 3) // Must be a Procedure
+        {
+            ERROR("Error: call statement may only target procedures");
+        }
+        emit(CAL, level - symbol_table[symIdx].level, symbol_table[symIdx].addr);
+
+        GET_TOKEN();
         return;
     }
     if (currentToken.type == writesym)
@@ -539,7 +573,7 @@ int VAR_DECLARATION(int level) // Returns number of variables
             {
                 ERROR("Error: symbol name has already been declared");
             }
-            add_symbol_table(2, currentToken.value, 0, 0, numVars + 2, 0);
+            add_symbol_table(2, currentToken.value, 0, level, numVars + 2, 0);
             GET_TOKEN();
         } while (currentToken.type == commasym);
         if (currentToken.type != semicolonsym)
@@ -586,7 +620,7 @@ void CONST_DECLARATION(int level)
             }
             // Add symbol to table
             int const_val = atoi(currentToken.value);
-            add_symbol_table(1, constName, const_val, 0, 0, 0);
+            add_symbol_table(1, constName, const_val, level, 0, 0);
             // Next token
             GET_TOKEN();
         } while (currentToken.type == commasym); // If there is a , after running then run again
@@ -613,7 +647,7 @@ int BLOCK(int level)
     }
 
     // Marks all of the symbols in the table as available/unavailable
-    for (int i = symbol_table_index - 1; i >= 0; i--) 
+    for (int i = symbol_table_index - 1; i >= 0; i--)
     {
         if (symbol_table[i].level == level)
         {
@@ -628,9 +662,9 @@ void PROGRAM()
     int jmpIndex = codeIndex; // will always be 0 (start of code)
 
     emit(JMP, 0, -1); // Emit placeholder -1 for later backpatching
-    
+
     int mainBlockLocation = BLOCK(0); // Block will generate the code for the whole program and then return the jmpIndex for the main block
-    
+
     code[jmpIndex].m = mainBlockLocation;
 
     if (currentToken.type != periodsym) // Program must end with period
