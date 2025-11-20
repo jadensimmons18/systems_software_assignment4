@@ -1,5 +1,19 @@
-var x, y;
+var a, b;
+procedure x;
+var q, w;
 begin
-read y;
-x := y * 2;
-end
+q := 1;
+end;
+begin
+a := 2;
+call x;
+end.var a, b;
+procedure x;
+var q, w;
+begin
+q := 1;
+end;
+begin
+a := 2;
+call x;
+end.

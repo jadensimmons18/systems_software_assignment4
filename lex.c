@@ -183,7 +183,6 @@ void addToken(Token *tokenList, int *tokenListIndex, char *lexeme, int token)
     (*tokenListIndex)++;
 }
 
-//! Remember to change this back to a command argument for the input file
 int main(int argc, char *argv[])
 {
     int reservedWordArrLen = sizeof(reservedWordArr) / sizeof(reservedWordArr[0]);

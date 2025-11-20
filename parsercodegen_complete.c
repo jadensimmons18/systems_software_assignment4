@@ -218,6 +218,7 @@ void add_symbol_table(int kind, char *name, int val, int level, int addr, int ma
 }
 // Prototypes
 void EXPRESSION(int level);
+int BLOCK(int level);
 // Primary Functions:
 void FACTOR(int level)
 {
