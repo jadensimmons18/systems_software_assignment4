@@ -443,10 +443,10 @@ void STATEMENT(int level)
         
         if (currentToken.type != fisym)
         {
-            ERROR("Error: arithmetic equations must contain operands, parentheses, numbers, or symbols");
+            ERROR("Error: else must be followed by fi");
         }
         GET_TOKEN();
-        code[jpcIdx].m = codeIndex;
+        code[jmpIndex].m = codeIndex;
         return;
     }
     if (currentToken.type == whilesym)
@@ -647,7 +647,7 @@ int BLOCK(int level)
     // Marks all of the symbols in the table as available/unavailable
     for (int i = symbol_table_index - 1; i >= 0; i--)
     {
-        if (symbol_table[i].level == level)
+        if (symbol_table[i].level == level && symbol_table[i].mark == 0)
         {
             symbol_table[i].mark = 1; // 1 = Unavailable
         }
