@@ -1,3 +1,5 @@
+.vscode/
+
 # Output files
 elf.txt
 lex_output.txt

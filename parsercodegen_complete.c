@@ -660,11 +660,11 @@ void PROGRAM()
 {
     int jmpIndex = codeIndex; // will always be 0 (start of code)
 
-    emit(JMP, 0, -1); // Emit placeholder -1 for later backpatching
+    emit(JMP, 0, 0); // Emit placeholder 0 for later backpatching
 
     int mainBlockLocation = BLOCK(0); // Block will generate the code for the whole program and then return the jmpIndex for the main block
 
-    code[jmpIndex].m = mainBlockLocation;
+    code[jmpIndex].m = mainBlockLocation * 3; // Multiply by 3 because each code index contains 3 slots of data
 
     if (currentToken.type != periodsym) // Program must end with period
     {
@@ -678,8 +678,16 @@ int main()
     inFile = fopen("lex_output.txt", "r");
     outFile = fopen("elf.txt", "w");
     GET_TOKEN(); // Gets the first token
-    PROGRAM();
+    PROGRAM(); // Start the parser
 
+
+
+
+
+
+
+
+    //* Handles printing
     printf("Assembly Code:\n\n");
     printf("Line\tOP\tL\tM\n");
     // Print the code array to elf.txt and terminal
