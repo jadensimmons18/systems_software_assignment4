@@ -384,8 +384,8 @@ void STATEMENT(int level)
 {
     if (currentToken.type == identsym) // If the token is an identifier
     {
-        int symIdx = symbol_table_check(currentToken.value); // table check
-        if (symIdx == -1)
+        int symIdx = symbol_table_check(currentToken.value); // Check if the identifier is declared
+        if (symIdx == -1) // If not error
         {
             ERROR("Error: undeclared identifier");
         }
@@ -398,7 +398,7 @@ void STATEMENT(int level)
         {
             ERROR("Error: assignment statements must use :=");
         }
-        GET_TOKEN();
+        GET_TOKEN(); // Next token shopuld be the value that you setting to the identifier
         EXPRESSION(level);
         emit(STO, level - symbol_table[symIdx].level, symbol_table[symIdx].addr);
         return;
@@ -543,7 +543,11 @@ void PROCEDURE_DECLARATION(int level)
         }
         GET_TOKEN();
         add_symbol_table(3, procName, 0, level, codeIndex * 3, 0); // procedure kind = 3
-        BLOCK(level + 1);
+
+        int jmpIndex = codeIndex;
+        emit(JMP, 0 , 0); // Emit placeholder
+        int mainBlockLocation = BLOCK(level + 1);
+        code[jmpIndex].m = mainBlockLocation * 3;
 
         if (currentToken.type != semicolonsym)
         {
@@ -638,10 +642,10 @@ int BLOCK(int level)
     
     int codeStart = codeIndex;
     // todo idk if this is right???
-    if (level > 0)
-    {
-        emit(JMP, 0, (codeIndex * 3) + 3); // jmp over the current instruction
-    }
+    // if (level > 0)
+    // {
+    //     emit(JMP, 0, (codeIndex * 3) + 3); // jmp to the start of the procedures logic
+    // }
     emit(INC, 0, 3 + numVars);
     STATEMENT(level);
 
