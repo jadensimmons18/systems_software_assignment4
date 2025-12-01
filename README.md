@@ -45,3 +45,28 @@ gcc -O2 -std=c11 -o parsercodegen_complete parsercodegen_complete.c
 
 # 3. Compile the Virtual Machine
 gcc -O2 -std=c11 -o vm vm.c
+```
+## Execution
+
+```bash
+# 1. Run the Lexical Analyzer with the input file as a command line argument
+./lex input.txt
+
+# 2. Run the Parser and Code Generator
+./parsercode_complete
+
+# 3. Run the Virtual Machine
+./vm elf.txt
+```
+
+## Instruction Set Architecture
+
+01,LIT,Push a literal constant onto the stack.
+02,OPR,"Arithmetic/Logic (ADD, SUB, MUL, DIV, EQL, NEQ, LSS, LEQ, GTR, GEQ, ODD)."
+03,LOD,Load value to top of stack from a specific offset.
+04,STO,Store value from top of stack to a specific offset.
+05,CAL,Call a procedure (generates new Activation Record).
+06,INC,Increment stack pointer (allocate memory).
+07,JMP,Unconditional jump (Program Counter modification).
+08,JPC,Jump conditional (Jump if top of stack is 0).
+09,SYS,"System calls (1=Print, 2=Read, 3=Halt).
